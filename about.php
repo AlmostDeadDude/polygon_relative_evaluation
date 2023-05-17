@@ -4,7 +4,7 @@ $Campaign_id = $_GET["campaign"];
 $Worker_id = $_GET["worker"];
 $Rand_key = $_GET["rand_key"];
 
-@require_once('header.php');
+require_once('header.php');
 echo '
 <div style="max-width: 1200px; text-align: justify;">
 <h2>Introduction</h2>
@@ -34,8 +34,8 @@ if ($firstTime == 'true') {
   echo '<button class="toTaskBtn" onclick="startTask()">Start task</button>';
   echo '<script>
     function startTask() {
-        window.location.href = "index.php?campaign=' . $Campaign_id . '&worker=' . $Worker_id . '&rand_key=' . $Rand_key . '";
+        window.location.href = "qualification.php?campaign=' . $Campaign_id . '&worker=' . $Worker_id . '&rand_key=' . $Rand_key . '";
     }
     </script>';
 }
-@require_once('footer.php');
+require_once('footer.php');
