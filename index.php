@@ -13,7 +13,7 @@ $vcode_for_proof = "mw-" . hash("sha256", $String_final);
 //first count how many files are in the jobs folder
 $total_numb_jobs = count(glob('jobs/*'));
 //set up the desired number of iterations
-$total_numb_it = 500;
+$total_numb_it = 1;
 //default values = error codes for later
 $next_job = 10000;
 $next_it = 10000;
@@ -64,6 +64,8 @@ $data = array();
 
 $tasks_per_job = 5;
 $tasks_counter = 0;
+$pics_in_task = 3;
+$pics_counter = 0;
 
 while (($line = fgets($handle)) !== false) {
   // Skip empty lines
@@ -79,14 +81,15 @@ while (($line = fgets($handle)) !== false) {
   }
 
   // Append parsed JSON to data array
-  $job_nr = $tasks_counter % $tasks_per_job;
-  if (!isset($data[$job_nr])) {
-    $data[$job_nr] = array();
+  if (!isset($data[$tasks_counter])) {
+    $data[$tasks_counter] = array();
   }
-  $data[$job_nr][] = $json_data;
-
-  // Increment tasks counter
-  $tasks_counter++;
+  $data[$tasks_counter][$pics_counter] = $json_data;
+  $pics_counter++;
+  if ($pics_counter == $pics_in_task) {
+    $pics_counter = 0;
+    $tasks_counter++;
+  }
 }
 fclose($handle);
 
