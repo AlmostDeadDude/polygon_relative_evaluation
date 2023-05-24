@@ -165,7 +165,7 @@ if (page === "index.php" || page === "" || page === 'qualification.php') {
                     //if the sequence is correct, we allow the user to go to the main task
                     ratingWrapper.innerHTML = "<h2>Correct!</h2><p>You will now be redirected to the main task.</p><div class='loader'><i class='fas fa-spinner'></i></div>";
                     setTimeout(() => {
-                        window.location.href = "index.php?campaign=" + userInfo.campaign + "&worker=" + userInfo.worker + "&random=" + userInfo.random;
+                        window.location.href = "index.php?campaign=" + userInfo.campaign + "&worker=" + userInfo.worker + "&rand_key=" + userInfo.random;
                     }, 3000);
                 } else {
                     //otherwise, we show a warning telling the user to try again
