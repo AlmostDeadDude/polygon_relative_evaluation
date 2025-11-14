@@ -1,21 +1,13 @@
 <?php
-// Redirect to the same page without the query parameters to prevent further file deletions - weak stuff but good enough for testing campaigns
-if (isset($_GET['file'])) {
-    $filename = $_GET['file'];
-    //if such field exists - delete the file
-    unlink('results/job_' . $filename . '.txt'); //delete result file for job assignment to be faster
-    unlink('user_info/job_' . $filename . '.txt'); //delete user_info *not necessary but why not
-
-    header('Location: failed.php');
-    exit();
-}
-
 require_once('header.php');
 ?>
 
 <div id="failContainer">
-    <h1>😕</h1>
-    <h1>We're sorry, but you did not pass the hidden control task and thus are not eligible for the VCODE at this time.</h1>
+    <h1>Demo mode active</h1>
+    <h1>The portfolio build no longer enforces hidden control tasks or proof code distribution.</h1>
+    <p>In production, this page appeared when a worker failed the hidden control polygon that was mixed into every batch. It prevented low-quality answers from reaching the final dataset and automatically released the job back to the queue.</p>
+    <p>For the public demo we keep this page purely for documentation. Feel free to head back to the main task and load another random job.</p>
+    <button class="toTaskBtn" onclick="window.location.href='index.php';">Return to demo</button>
 </div>
 
 <?php

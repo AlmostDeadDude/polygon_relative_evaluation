@@ -3,10 +3,10 @@ let page = window.location.pathname.split("/").pop();;
 
 //in both cases:
 //update the year in the footer
-document.getElementById("year").innerHTML = new Date().getFullYear();
+// document.getElementById("year").innerHTML = new Date().getFullYear();
 
-//specific for index.php and results.php
-if (page === "index.php" || page === "" || page === 'qualification.php') {
+//specific for index.php
+if (page === "index.php" || page === "") {
     // variables and dom elements
     let userClicked = false;
     const values = [];
@@ -92,10 +92,13 @@ if (page === "index.php" || page === "" || page === 'qualification.php') {
                     [...ratingList.querySelector('.active').children].forEach((item, index) => {
                         values[current_job][index + 1] = item.querySelector("span").innerText;
                     });
-                    document.getElementById('task_counter_bar').style.width = (current_job + 1) / total_jobs * 100 + '%';
+                    const progressBar = document.getElementById('task_counter_bar');
+                    if (progressBar) {
+                        progressBar.style.width = (current_job + 1) / total_jobs * 100 + '%';
+                    }
 
                     //if there are more tasks to do - save current results and display the next task
-                    if (current_job < total_jobs) {
+                    if (current_job < total_jobs - 1) {
                         //then go for the next task
                         document.getElementById('job_' + current_job).classList.remove('active');
                         document.getElementById('rating_job_' + current_job).classList.remove('active');
@@ -110,27 +113,14 @@ if (page === "index.php" || page === "" || page === 'qualification.php') {
                         });
                         userClicked = false;
                     } else {
-                        //check the last task solution
-                        //reference: 96, 36, 41
-                        const reference = {
-                            1: "Task #96",
-                            2: "Task #36",
-                            3: "Task #41",
-                        }
-                        //if the answer is incorrect, redirect to the failed page
-                        let valuesLast = values[total_jobs];
-                        if (valuesLast[1] != reference[1] || valuesLast[2] != reference[2] || valuesLast[3] != reference[3]) {
-                            //also send the filename to the failed page - weak security but will do for now
-                            window.location.href = "failed.php?file=" + dataInfo.job + "_" + dataInfo.iteration;
-                            return;
-                        } else {
-                            //otherwise save the results and redirect to the results page
-                            //send data as json 
-                            let data = JSON.stringify({
-                                userInfo: userInfo,
-                                dataInfo: dataInfo,
-                                values: values,
-                            });
+                        //otherwise save the results and redirect to the results page
+                        //send data as json 
+                        let data = JSON.stringify({
+                            userInfo: userInfo,
+                            dataInfo: dataInfo,
+                            values: values,
+                        });
+                        try {
                             let response = await fetch("saveResults.php", {
                                 method: "POST",
                                 body: data,
@@ -138,52 +128,33 @@ if (page === "index.php" || page === "" || page === 'qualification.php') {
                                     "Content-Type": "application/json",
                                 },
                             });
-                            let result = await response.text();
-                            console.log(result);
-                            if (result == "success") {
-                                window.location.href = "results.php?vcode=" + userInfo.vcode;
+                            let result = await response.json();
+                            if (result.status === "success") {
+                                window.location.href = "results.php";
+                            } else {
+                                throw new Error(result.message || "Unexpected response");
                             }
+                        } catch (error) {
+                            console.error(error);
+                            alert("Something went wrong while finishing the demo. Please try again.");
                         }
                     }
                 }
             });
         }
-    } else { //qualification.php
-        //adjust the header text
-        document.querySelector("header span").innerText = "Qualification Task";
-        //proper sequence is: BCA
-        const properSequence = ["B", "C", "A"];
-        //when user submits we compare the submission against the proper sequence
-        if (confirmBtn) {
-            confirmBtn.addEventListener("click", () => {
-                //get the data from the #rating ul
-                [...ratingList.querySelector('.active').children].forEach((item, index) => {
-                    values[index + 1] = item.querySelector("span").innerText.slice(-1);
-                });
-                //compare the values to the proper sequence
-                if (values[1] === properSequence[0] && values[2] === properSequence[1] && values[3] === properSequence[2]) {
-                    //if the sequence is correct, we allow the user to go to the main task
-                    ratingWrapper.innerHTML = "<h2>Correct!</h2><p>You will now be redirected to the main task.</p><div class='loader'><i class='fas fa-spinner'></i></div>";
-                    setTimeout(() => {
-                        window.location.href = "index.php?campaign=" + userInfo.campaign + "&worker=" + userInfo.worker + "&rand_key=" + userInfo.random;
-                    }, 3000);
-                } else {
-                    //otherwise, we show a warning telling the user to try again
-                    alert("The placement is not correct! Please evaluate the selections properly.");
-                }
-            });
-        }
     }
 } else if (page === "results.php") {
-    //the results page onle needs a simple button to copy the vcode to the clipboard
-    const copyBtn = document.getElementById("copyVcodeBtn");
-    const vcodeEl = document.getElementById("vcodeContainer");
-    copyBtn.addEventListener("click", () => {
-        navigator.clipboard.writeText(vcodeEl.innerText.trim());
-        copyBtn.innerText = "Copied!";
-    });
+    //the results page now simply links back to a fresh random job
+    const retryBtn = document.getElementById("copyVcodeBtn");
+    if (retryBtn) {
+        retryBtn.addEventListener("click", () => {
+            window.location.href = "index.php";
+        });
+    }
 } else {
-    //page === "about.php"
-    //disable the link to about php - it is not needed
-    document.querySelector('header a').remove();
+    //non-task informational pages
+    const infoLink = document.querySelector('header a');
+    if (infoLink) {
+        infoLink.remove();
+    }
 }
