@@ -10,7 +10,11 @@ echo '
             </p>
         </div>
         <div class="footer-bottom">
-            <p>&copy <span id="year">2023</span></p>
+            <small>
+            © <span id="year">2023</span>, Ivan Shiller <a href="https://github.com/AlmostDeadDude/polygon_relative_evaluation" target="_blank" rel="noopener noreferrer">
+                <i class="fa-brands fa-github"></i>
+            </a> 
+        </small>
         </div>
     </footer>
 <script src="js/script.js"></script>
